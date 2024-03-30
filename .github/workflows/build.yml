@@ -20,9 +20,6 @@ jobs:
         shell: bash {0}
         run: |
           exit_on_error() { echo "$1"; exit 1; }
-          echo "Setting vars"
-          UPLOAD_DIR_PATH="./app/build/outputs"
-          echo "APK_DIR_PATH=$APK_DIR_PATH" >> $GITHUB_ENV
           if ! ./gradlew assembleDebug; then
             exit_on_error "Build failed."
           fi
@@ -32,4 +29,4 @@ jobs:
         with:
           name: Upload outputs dir
           path: |
-            ${{ env.UPLOAD_DIR_PATH }}/*
+            ./app/build/outputs/*
