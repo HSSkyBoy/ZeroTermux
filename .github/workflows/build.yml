@@ -1,0 +1,35 @@
+name: Build
+
+on:
+  [workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build APKs
+        shell: bash {0}
+        run: |
+          exit_on_error() { echo "$1"; exit 1; }
+          echo "Setting vars"
+          UPLOAD_DIR_PATH="./app/build/outputs"
+          echo "APK_DIR_PATH=$APK_DIR_PATH" >> $GITHUB_ENV
+          if ! ./gradlew assembleDebug; then
+            exit_on_error "Build failed."
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Upload outputs dir
+          path: |
+            ${{ env.UPLOAD_DIR_PATH }}/*
